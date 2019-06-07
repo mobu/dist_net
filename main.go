@@ -26,7 +26,7 @@ type AddToClusterMessage struct {
 }
 
 /* Just for pretty printing the node info */
-/* using go's method implementation to attach methods to the
+/* using go's method implementation to attach String method to the
 NodeInfo struct */
 func (node NodeInfo) String() string {
 	return "NodeInfo:{ nodeId: " + strconv.Itoa(node.NodeId) + ", nodeIpAddr: " + node.NodeIpAddr + ", port:" + node.Port + " }"
@@ -46,12 +46,27 @@ func main() {
 	flag.Parse()
 
 	/* Generate id */
+	/* here we are using the rand.Seed() method to generate random seed
+	for the RNG */
+	// rand.Seed() expects a 64 bit integer value and here we are doing so
+	// by passing the value of current time and converting the time into
+	// 64 bit integer using UnixNano() function
 	rand.Seed(time.Now().UTC().UnixNano())
 	myid := rand.Intn(99999999)
 
 	/* get unicast address of the node. Typical form for an IP address */
-	myIp, _ := net.InterfaceAddrs()
-
+	addr, err := net.InterfaceAddrs()
+	if err != nil {
+		os.Stderr.WriteString("Could not retrieve interface addresses.\nError: " + err.Error() + "\n")
+		os.Exit(1)
+	}
+	for _, a := range addr {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				myIp := ipnet.IP.String()
+			}
+		}
+	}
 	/* create a NodeInfo struct using the values provided
 	 *myport is deferencing the pointer myport to retrieve the actual value */
 	me := NodeInfo{NodeId: myid, NodeIpAddr: myIp[0].String(), Port: *myport}
