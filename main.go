@@ -26,6 +26,8 @@ type AddToClusterMessage struct {
 }
 
 /* Just for pretty printing the node info */
+/* using go's method implementation to attach methods to the
+NodeInfo struct */
 func (node NodeInfo) String() string {
 	return "NodeInfo:{ nodeId: " + strconv.Itoa(node.NodeId) + ", nodeIpAddr: " + node.NodeIpAddr + ", port:" + node.Port + " }"
 }
