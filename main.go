@@ -54,14 +54,21 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	myid := rand.Intn(99999999)
 
-	/* get unicast address of the node. Typical form for an IP address */
+	// InterfaceAddrs returns a list of the system's network interface addresses. 
 	addr, err := net.InterfaceAddrs()
+	// if there's an error, show error message and exit program
 	if err != nil {
 		os.Stderr.WriteString("Could not retrieve interface addresses.\nError: " + err.Error() + "\n")
 		os.Exit(1)
 	}
+	// go through all the network interfaces found
+	// range cycles through the whole array/slice of InterfaceAddrs()
 	for _, a := range addr {
+		// short one-liner to retrieve the value for IP address
+		// the ok keyword is a boolean in Go and it is true if the function
+		// returns true
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			// IP.To4 converts the IPv4 address to a 4-byte representation
 			if ipnet.IP.To4() != nil {
 				myIp := ipnet.IP.String()
 			}
