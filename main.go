@@ -54,7 +54,7 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	myid := rand.Intn(99999999)
 
-	// InterfaceAddrs returns a list of the system's network interface addresses. 
+	// InterfaceAddrs returns a list of the system's network interface addresses.
 	addr, err := net.InterfaceAddrs()
 	// if there's an error, show error message and exit program
 	if err != nil {
