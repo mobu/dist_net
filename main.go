@@ -5,7 +5,8 @@ import (
 	"flag" //Package flag implements command-line flag parsing
 	"fmt"  //formatting and printing
 	"math/rand"
-	"net"     //net provides a portable interface for network I/O
+	"net" //net provides a portable interface for network I/O
+	"os"
 	"strconv" //implements conversions to and from string representations of basic data types
 	"strings"
 	"time"
@@ -44,6 +45,7 @@ func main() {
 	clusterip := flag.String("clusterip", "127.0.0.1:8001", "ip address of any node to connect")
 	myport := flag.String("myport", "8001", "ip address to run this node on. default is 8001.")
 	flag.Parse()
+	var myIp string
 
 	/* Generate id */
 	/* here we are using the rand.Seed() method to generate random seed
@@ -70,13 +72,13 @@ func main() {
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			// IP.To4 converts the IPv4 address to a 4-byte representation
 			if ipnet.IP.To4() != nil {
-				myIp := ipnet.IP.String()
+				myIp = ipnet.IP.String()
 			}
 		}
 	}
 	/* create a NodeInfo struct using the values provided
 	 *myport is deferencing the pointer myport to retrieve the actual value */
-	me := NodeInfo{NodeId: myid, NodeIpAddr: myIp[0].String(), Port: *myport}
+	me := NodeInfo{NodeId: myid, NodeIpAddr: myIp, Port: *myport}
 
 	/* Still figuring out why the NodeId is -1.
 	getting the IP address and Port number by using the split func on clusterip */
