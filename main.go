@@ -1,6 +1,7 @@
 package main
 
 import (
+	"golang.org/x/crypto/ssh"	// for SSH tunneling into other clients/servers
 	"encoding/json"
 	"flag" //Package flag implements command-line flag parsing
 	"fmt"  //formatting and printing
