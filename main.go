@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"flag" //Package flag implements command-line flag parsing
 	"fmt"  //formatting and printing
-	"math/rand"
+	"math/rand"	// for cryptographically secured random number
 	"net" //net provides a portable interface for network I/O
 	"os"	// provides a platform-independent interface to operating system functionality
 	"syscall"	// contains an interface to the low-level operating system primitives
 	"strconv" //implements conversions to and from string representations of basic data types
 	"strings"
 	"time"
+	"log"	// for logging purposes
 )
 
 /* Information about node */
@@ -46,7 +47,6 @@ func main() {
 	makeMasterOnError := flag.Bool("makeMasterOnError", false, "make this node master if unable to connect to the cluster ip provided.")
 	clusterip := flag.String("clusterip", "127.0.0.1:8001", "ip address of any node to connect")
 	myport := flag.String("myport", "8001", "ip address to run this node on. default is 8001.")
-	makeDaemon := flag.Bool("d",false,"start a background daemon")
 	flag.Parse()
 	var myIp string
 
@@ -79,7 +79,7 @@ func main() {
 			}
 		}
 	}
-	/* create a NodeInfo struct using the values provided
+	/* create a NodeInfo object using the values provided
 	 *myport is deferencing the pointer myport to retrieve the actual value */
 	me := NodeInfo{NodeId: myid, NodeIpAddr: myIp, Port: *myport}
 
