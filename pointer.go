@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strings"
+	//"strings"
 )
 
 func main() {
@@ -16,10 +16,16 @@ func main() {
 		os.Exit(0)
 	}
 	if len(interfaces) > 0 {
-		fmt.Println("List of available network interfaces: \n")
+		fmt.Println("\nList of available network interfaces:")
 		for index, i := range interfaces {
 			fmt.Printf("%d.%v\n", index, i.Name)
 		}
-
+		fmt.Printf("\nSelect the interface that you want to use: (0-%d): ", len(interfaces))
+		reader := bufio.NewReader(os.Stdin)
+		char, _, err := reader.ReadRune()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(char)
 	}
 }
