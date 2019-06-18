@@ -1,23 +1,25 @@
 package main
 
 import (
-    "fmt"
+	"bufio"
+	"fmt"
+	"net"
+	"os"
+	"strings"
 )
 
-type Person struct{
-	firstName 	string
-	lastName	string
-}
-
-func changeName(p *Person){
-	p.firstName = "Bob"
-}
-
-func main(){
-	person := Person{
-		firstName:	"Alice",
-		lastName:	"Dow",
+func main() {
+	interfaces, err := net.Interfaces()
+	//	error handling
+	if err != nil {
+		fmt.Println("Error in detecting network interfaces: " + err.Error())
+		os.Exit(0)
 	}
-	changeName(&person)
-	fmt.Println(person)
+	if len(interfaces) > 0 {
+		fmt.Println("List of available network interfaces: \n")
+		for index, i := range interfaces {
+			fmt.Printf("%d.%v\n", index, i.Name)
+		}
+
+	}
 }

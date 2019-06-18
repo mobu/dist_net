@@ -1,18 +1,19 @@
 package main
 
 import (
-	"golang.org/x/crypto/ssh"	// for SSH tunneling into other clients/servers
+	"bufio" // for console input from user
 	"encoding/json"
-	"flag" //Package flag implements command-line flag parsing
-	"fmt"  //formatting and printing
-	"math/rand"	// for cryptographically secured random number
-	"net" //net provides a portable interface for network I/O
-	"os"	// provides a platform-independent interface to operating system functionality
-	"syscall"	// contains an interface to the low-level operating system primitives
-	"strconv" //implements conversions to and from string representations of basic data types
+	"flag"                    //Package flag implements command-line flag parsing
+	"fmt"                     //formatting and printing
+	"golang.org/x/crypto/ssh" // for SSH tunneling into other clients/servers
+	"log"                     // for logging purposes
+	"math/rand"               // for cryptographically secured random number
+	"net"                     //net provides a portable interface for network I/O
+	"os"                      // provides a platform-independent interface to operating system functionality
+	"strconv"                 //implements conversions to and from string representations of basic data types
 	"strings"
+	"syscall" // contains an interface to the low-level operating system primitives
 	"time"
-	"log"	// for logging purposes
 )
 
 /* Information about node */
@@ -40,6 +41,20 @@ func (node NodeInfo) String() string {
 // here we are overloading the String() function
 func (req AddToClusterMessage) String() string {
 	return "AddToClusterMessage:{\n source: " + req.Source.String() + ",\n dest: " + req.Dest.String() + ",\n message: " + req.Message + " }"
+}
+
+// function for displaying available network interfaces
+func availableInterfaces() {
+	interfaces, err := net.Interfaces()
+	//	error handling
+	if err != nil {
+		fmt.Println("Error in detecting network interfaces: " + err.Error())
+		os.Exit(0)
+	}
+	fmt.Println("List of available network interfaces: ")
+	for _, i := range interfaces {
+		fmt.Printf("Name : %v \n", i.Name)
+	}
 }
 
 func main() {
