@@ -75,17 +75,20 @@ func wakeOnLan(ip string) {
 	}
 	//	resolve the IP address
 	//	here im just concatenating the ip address with the port number ip:port
-	addr, err := net.ResolveIPAddr("ip", ip_addr[0]+":"+strconv.Itoa(port_num))
+	addr, err := net.ResolveUDPAddr("ip", ip_addr[0]+":"+strconv.Itoa(port_num))
 	if err != nil {
-		fmt.Println("Resolution error", err.Error())
+		fmt.Println("Unable to get a UDP address for %s\n", addr,err.Error())
 		os.Exit(1)
 	}
 	//	connect to the IP address
-	conn,err := net.DialIP("udp",addr,addr)
+	//	 keep the local address nil
+	conn,err := net.DialUDP("udp",nil,addr)
 	if err != nil{
-		fmt.Println("Could not connect to the destination",err.Error())
+		fmt.Println("Could not connect to the destination: %s\n",addr,err.Error())
 		os.Exit(1)
 	}
+	//	when all is done, close the connection
+	defer conn.close()
 
 
 	fmt.Println(addr.IP)
