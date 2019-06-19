@@ -44,7 +44,7 @@ func main() {
 		}
 		fmt.Println(char)
 	}
-	wakeOnLan("127.0.0.1:9","00-50-B6-9F-BD-F6")
+	wakeOnLan("localhost","00-50-B6-9F-BD-F6")
 
 }
 
@@ -90,8 +90,10 @@ func wakeOnLan(ip string,mac string) {
 	}
 	// Fill our byte buffer with the bytes in our MagicPacket
 	var buf bytes.Buffer
-	binary.Write(&buf,binary.BigEndian,packet)
-	log.Println(buf)
+	if(binary.Write(&buf,binary.BigEndian,packet) != nil){
+		fmt.Println("Failed writing to the buffer")
+		os.Exit(1)
+	}
 	//	split the ip string to check for any port number
 	ip_addr := strings.Split(ip, ":")
 	//	if port is given, store it in port_num or
@@ -110,7 +112,6 @@ func wakeOnLan(ip string,mac string) {
 		fmt.Println("Unable to get a UDP address for %s\n", addr,err.Error())
 		os.Exit(1)
 	}
-	log.Println(addr)
 	//	connect to the IP address
 	//	 keep the local address nil
 	conn,err := net.DialUDP("udp",nil,addr)
