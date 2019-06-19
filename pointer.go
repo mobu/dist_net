@@ -62,7 +62,7 @@ func wakeOnLan(ip string,mac string) {
 	//	6. {5} - match five consecutive patterns like above
 	//	7. For the last two hex digits, we are pretty much doing the same thing except
 	//	   eliminating the colon
-	re_MAC := regexp.MustCompile(`^(([\da-fA-F]{2}[-:]){5}[\da-fA-F]{2})$|^([\da-fA-F]{12}$)`)
+	re_MAC := regexp.MustCompile(`^(([\da-fA-F]{2}[-:.]){5}[\da-fA-F]{2})$|^([\da-fA-F]{12})$`)
 	//	if MAC address is not valid
 	if !re_MAC.MatchString(mac){
 		fmt.Println("MAC address" + mac + " is not valid")
