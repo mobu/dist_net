@@ -45,6 +45,7 @@ func (req AddToClusterMessage) String() string {
 
 // function for displaying available network interfaces
 func availableInterfaces() {
+	//	get network interfaces currently available
 	interfaces, err := net.Interfaces()
 	//	error handling
 	if err != nil {

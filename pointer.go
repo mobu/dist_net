@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	//	get network interfaces currently available
 	interfaces, err := net.Interfaces()
 	//	error handling
 	if err != nil {
