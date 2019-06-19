@@ -47,10 +47,10 @@ func main() {
 
 }
 
-func wakeOnLan(ip string) {
+func wakeOnLan(ip string,mac string) {
 	//	 port to connect to
 	var port_num int
-	//	delimeters for MAC address
+	//	delimiters for MAC address
 	delims := ":-"
 	//	regex statement
 	//	Explanation of the regex below:
@@ -58,11 +58,18 @@ func wakeOnLan(ip string) {
 	//	2. () - create a capture group
 	//	3. [0-9a-fA-F] - as long as anything inside the list matches
 	//	4. {2} - they have to match twice
-	//	5. [':'] - match the delimeter literally (exactly)
+	//	5. [':'] - match the delimiter literally (exactly)
 	//	6. {5} - match five consecutive patterns like above
 	//	7. For the last two hex digits, we are pretty much doing the same thing except
 	//	   eliminating the colon
-	re_MAC := regexp.MustCompile(`^([0-9a-fA-F]{2}[`+delims+`]){5}([0-9a-fA-F]{2})$`)
+	re_MAC := regexp.MustCompile(`^(([\da-fA-F]{2}[-:]){5}[\da-fA-F]{2})$|^([\da-fA-F]{12}$)`)
+	//	if MAC address is not valid
+	if !re_MAC.MatchString(mac){
+		fmt.Println("MAC address" + mac + " is not valid")
+		return nil
+	}
+
+	hwAddr,err := net.ParseMAC(mac)
 	//	split the ip string to check for any port number
 	ip_addr := strings.Split(ip, ":")
 	//	if port is given, store it in port_num or
