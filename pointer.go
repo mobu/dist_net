@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
-	"bytes"
-	"io"
+	//"bytes"
+	//"io"
 	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"strings"
+	"regexp"
 )
 
 //	A MAC address is 6 bytes
@@ -49,6 +50,19 @@ func main() {
 func wakeOnLan(ip string) {
 	//	 port to connect to
 	var port_num int
+	//	delimeters for MAC address
+	delims := ":-"
+	//	regex statement
+	//	Explanation of the regex below:
+	//	1. ^  - this denotes that regex starts from the beginning
+	//	2. () - create a capture group
+	//	3. [0-9a-fA-F] - as long as anything inside the list matches
+	//	4. {2} - they have to match twice
+	//	5. [':'] - match the delimeter literally (exactly)
+	//	6. {5} - match five consecutive patterns like above
+	//	7. For the last two hex digits, we are pretty much doing the same thing except
+	//	   eliminating the colon
+	re_MAC := regexp.MustCompile(`^([0-9a-fA-F]{2}[`+delims+`]){5}([0-9a-fA-F]{2})$`)
 	//	split the ip string to check for any port number
 	ip_addr := strings.Split(ip, ":")
 	//	if port is given, store it in port_num or
@@ -75,7 +89,7 @@ func wakeOnLan(ip string) {
 		os.Exit(1)
 	}
 	//	when all is done, close the connection
-	defer conn.close()
+	defer conn.Close()
 
 
 	fmt.Println(addr.IP)
