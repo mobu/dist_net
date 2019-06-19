@@ -2,24 +2,25 @@ package main
 
 import (
 	"bufio"
-	//"bytes"
-	//"io"
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 	"regexp"
+	"log"
 )
 
 //	A MAC address is 6 bytes
-type MacAddress [6]byte
+type MACAddress [6]byte
 
 // A MagicPacket is constituted of 6 bytes of 0xFF followed by
 // 16 groups of the destination MAC address.
 type MagicPacket struct{
 	header	[6]byte
-	payload	[16]MacAddress
+	payload	[16]MACAddress
 }
 
 func main() {
@@ -43,7 +44,7 @@ func main() {
 		}
 		fmt.Println(char)
 	}
-	wakeOnLan("127.0.0.1")
+	wakeOnLan("127.0.0.1:9","00-50-B6-9F-BD-F6")
 
 }
 
@@ -65,19 +66,15 @@ func wakeOnLan(ip string,mac string) {
 	//	6. {5} - match five consecutive patterns like above
 	//	7. For the last two hex digits, we are pretty much doing the same thing except
 	//	   eliminating the colon
-	re_MAC := regexp.MustCompile(
-		`^(([\da-fA-F]{2}[-:.]){5}[\da-fA-F]{2})$|^([\da-fA-F]{12})$|^(([\da-fA-F]{4}[-:.]){3}[\da-fA-F]{4})$|^(([\da-fA-F]{2}[-:.]){19}[\da-fA-F]{2})$|^(([\da-fA-F]{4}[-:.]){2}[\da-fA-F]{4})$|^(([\da-fA-F]{4}[-:.]){9}[\da-fA-F]{4})$`
-	)
+	re_MAC := regexp.MustCompile(`^(([\da-fA-F]{2}[-:.]){5}[\da-fA-F]{2})$|^([\da-fA-F]{12})$|^(([\da-fA-F]{4}[-:.]){3}[\da-fA-F]{4})$|^(([\da-fA-F]{2}[-:.]){19}[\da-fA-F]{2})$|^(([\da-fA-F]{4}[-:.]){2}[\da-fA-F]{4})$|^(([\da-fA-F]{4}[-:.]){9}[\da-fA-F]{4})$`)
 	//	if MAC address is not valid
 	if !re_MAC.MatchString(mac){
 		fmt.Println("MAC address" + mac + " is not valid")
-		return nil
 	}
 	//	HardwareAddr is a byte string
 	hwAddr,err := net.ParseMAC(mac)
 	if err != nil{
 		fmt.Println("Could not parse MAC address. Please make sure it is valid.")
-		return nil
 	}
 	// copy bytes from hwAddr to macAddr bytes of MACAddress struct
 	for idx := range macAddr{
@@ -91,6 +88,9 @@ func wakeOnLan(ip string,mac string) {
 	for idx := range packet.payload{
 		packet.payload[idx] = macAddr
 	}
+	// Fill our byte buffer with the bytes in our MagicPacket
+	var buf bytes.Buffer
+	binary.Write(&buf,binary.BigEndian,packet)
 	//	split the ip string to check for any port number
 	ip_addr := strings.Split(ip, ":")
 	//	if port is given, store it in port_num or
@@ -104,11 +104,12 @@ func wakeOnLan(ip string,mac string) {
 	}
 	//	resolve the IP address
 	//	here im just concatenating the ip address with the port number ip:port
-	addr, err := net.ResolveUDPAddr("ip", ip_addr[0]+":"+strconv.Itoa(port_num))
+	addr, err := net.ResolveUDPAddr("udp", ip_addr[0]+":"+strconv.Itoa(port_num))
 	if err != nil {
 		fmt.Println("Unable to get a UDP address for %s\n", addr,err.Error())
 		os.Exit(1)
 	}
+	log.Println(addr)
 	//	connect to the IP address
 	//	 keep the local address nil
 	conn,err := net.DialUDP("udp",nil,addr)
@@ -118,8 +119,13 @@ func wakeOnLan(ip string,mac string) {
 	}
 	//	when all is done, close the connection
 	defer conn.Close()
-
-
-	fmt.Println(addr.IP)
-	fmt.Println(port_num)
+	// Write the bytes of the MagicPacket to the connection
+	bytesWritten,err := conn.Write(buf.Bytes())
+	if err != nil{
+		fmt.Println("Unable to send packet to the destination\n")
+		log.Println(err.Error())
+	}else if bytesWritten != 102{
+		fmt.Printf("Status: %d bytes written, %d expected\n",bytesWritten,102)
+		log.Println(err.Error())
+	}
 }
