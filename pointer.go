@@ -30,3 +30,12 @@ func main() {
 		fmt.Println(char)
 	}
 }
+
+func wakeOnLan(ip String,mac String){
+	addr, err := net.ResolveIPAddr("ip",net.ParseIP(ip))
+	if err != nil{
+		fmt.Println("Resolution error",err.Error())
+		os.Exit(1)
+	}
+
+}
