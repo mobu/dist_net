@@ -2,11 +2,13 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"io"
 	"fmt"
 	"net"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -30,28 +32,52 @@ func main() {
 		}
 		fmt.Println(char)
 	}
-	wakeOnLan("127.0.0.1:80")
+	wakeOnLan("127.0.0.1")
 
 }
 
-func wakeOnLan(ip string){
+func checkSum(msg []byte) uint16 {
+    sum := 0
+
+    // assume even for now
+    for n := 1; n < len(msg)-1; n += 2 {
+        sum += int(msg[n])*256 + int(msg[n+1])
+    }
+    sum = (sum >> 16) + (sum & 0xffff)
+    sum += (sum >> 16)
+    var answer uint16 = uint16(^sum)
+    return answer
+}
+
+func wakeOnLan(ip string) {
 	//	 port to connect to
 	var port_num int
 	//	split the ip string to check for any port number
-	ip_addr := strings.Split(ip,":")
+	ip_addr := strings.Split(ip, ":")
 	//	if port is given, store it in port_num or
 	//	else assign port_num a default port value (UDP 9)
-	if len(ip_addr[1]) > 0{
-		port_num,_ = strconv.Atoi(ip_addr[1])
-	}else{
+	if len(ip_addr) > 1 {
+		//	convert from string to integer
+		port_num, _ = strconv.Atoi(ip_addr[1])
+	} else {
+		//	default UDP port number for WakeOnLan service
 		port_num = 9
 	}
-	//resolve the IP address
-	addr, err := net.ResolveIPAddr("ip",ip_addr[0])
-	if err != nil{
-		fmt.Println("Resolution error",err.Error())
+	//	resolve the IP address
+	//	here im just concatenating the ip address with the port number ip:port
+	addr, err := net.ResolveIPAddr("ip", ip_addr[0]+":"+strconv.Itoa(port_num))
+	if err != nil {
+		fmt.Println("Resolution error", err.Error())
 		os.Exit(1)
 	}
+	//	connect to the IP address
+	conn,err := net.DialIP("udp",addr,addr)
+	if err != nil{
+		fmt.Println("Could not connect to the destination",err.Error())
+		os.Exit(1)
+	}
+	
+
 	fmt.Println(addr.IP)
 	fmt.Println(port_num)
 }
