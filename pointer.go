@@ -48,6 +48,10 @@ func main() {
 }
 
 func wakeOnLan(ip string,mac string) {
+	//	variable of type MagicPacket
+	var packet MagicPacket
+	//	variable of type MACAddress
+	var macAddr MACAddress
 	//	 port to connect to
 	var port_num int
 	//	regex statement
@@ -69,8 +73,24 @@ func wakeOnLan(ip string,mac string) {
 		fmt.Println("MAC address" + mac + " is not valid")
 		return nil
 	}
-
+	//	HardwareAddr is a byte string
 	hwAddr,err := net.ParseMAC(mac)
+	if err != nil{
+		fmt.Println("Could not parse MAC address. Please make sure it is valid.")
+		return nil
+	}
+	// copy bytes from hwAddr to macAddr bytes of MACAddress struct
+	for idx := range macAddr{
+		macAddr[idx] = hwAddr[idx]
+	}
+	//	setup the header which is 6 repetitions of 0xFF
+	for idx := range packet.header{
+		packet.header[idx] = 0xFF
+	}
+	//	setup the payload which is 16 repetitions of the MAC address
+	for idx := range packet.payload{
+		packet.payload[idx] = macAddr
+	}
 	//	split the ip string to check for any port number
 	ip_addr := strings.Split(ip, ":")
 	//	if port is given, store it in port_num or
