@@ -50,9 +50,8 @@ func main() {
 func wakeOnLan(ip string,mac string) {
 	//	 port to connect to
 	var port_num int
-	//	delimiters for MAC address
-	delims := ":-"
 	//	regex statement
+	//	this regex can match both 48-bit, 64-bit, and 20-octet MAC addresses
 	//	Explanation of the regex below:
 	//	1. ^  - this denotes that regex starts from the beginning
 	//	2. () - create a capture group
@@ -62,7 +61,9 @@ func wakeOnLan(ip string,mac string) {
 	//	6. {5} - match five consecutive patterns like above
 	//	7. For the last two hex digits, we are pretty much doing the same thing except
 	//	   eliminating the colon
-	re_MAC := regexp.MustCompile(`^(([\da-fA-F]{2}[-:.]){5}[\da-fA-F]{2})$|^([\da-fA-F]{12})$`)
+	re_MAC := regexp.MustCompile(
+		`^(([\da-fA-F]{2}[-:.]){5}[\da-fA-F]{2})$|^([\da-fA-F]{12})$|^(([\da-fA-F]{4}[-:.]){3}[\da-fA-F]{4})$|^(([\da-fA-F]{2}[-:.]){19}[\da-fA-F]{2})$|^(([\da-fA-F]{4}[-:.]){2}[\da-fA-F]{4})$|^(([\da-fA-F]{4}[-:.]){9}[\da-fA-F]{4})$`
+	)
 	//	if MAC address is not valid
 	if !re_MAC.MatchString(mac){
 		fmt.Println("MAC address" + mac + " is not valid")
