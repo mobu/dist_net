@@ -91,6 +91,7 @@ func wakeOnLan(ip string,mac string) {
 	// Fill our byte buffer with the bytes in our MagicPacket
 	var buf bytes.Buffer
 	binary.Write(&buf,binary.BigEndian,packet)
+	log.Println(buf)
 	//	split the ip string to check for any port number
 	ip_addr := strings.Split(ip, ":")
 	//	if port is given, store it in port_num or
