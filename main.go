@@ -1,18 +1,20 @@
 package main
 
 import (
-	"bufio" // for console input from user
+	"byte"						//	needed for WakeOnLan and misc. stuff
+	"bufio" 					// for console input from user
 	"encoding/json"
-	"flag"                    //Package flag implements command-line flag parsing
-	"fmt"                     //formatting and printing
-	"golang.org/x/crypto/ssh" // for SSH tunneling into other clients/servers
-	"log"                     // for logging purposes
-	"math/rand"               // for cryptographically secured random number
-	"net"                     //net provides a portable interface for network I/O
-	"os"                      // provides a platform-independent interface to operating system functionality
-	"strconv"                 //implements conversions to and from string representations of basic data types
+	"flag"						//Package flag implements command-line flag parsing
+	"fmt"                     	//formatting and printing
+	"golang.org/x/crypto/ssh" 	// for SSH tunneling into other clients/servers
+	"log"                     	// for logging purposes
+	"math/rand"               	// for cryptographically secured random number
+	"net"                     	//net provides a portable interface for network I/O
+	"os"                      	// provides a platform-independent interface to operating system functionality
+	"strconv"                 	//implements conversions to and from string representations of basic data types
 	"strings"
-	"syscall" // contains an interface to the low-level operating system primitives
+	"syscall" 					// contains an interface to the low-level operating system 
+								//	primitives
 	"time"
 )
 

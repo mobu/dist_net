@@ -11,6 +11,16 @@ import (
 	"strings"
 )
 
+//	A MAC address is 6 bytes
+type MacAddress [6]byte
+
+// A MagicPacket is constituted of 6 bytes of 0xFF followed by
+// 16 groups of the destination MAC address.
+type MagicPacket struct{
+	header	[6]byte
+	payload	[16]MacAddress
+}
+
 func main() {
 	//	get network interfaces currently available
 	interfaces, err := net.Interfaces()
@@ -76,7 +86,7 @@ func wakeOnLan(ip string) {
 		fmt.Println("Could not connect to the destination",err.Error())
 		os.Exit(1)
 	}
-	
+
 
 	fmt.Println(addr.IP)
 	fmt.Println(port_num)
