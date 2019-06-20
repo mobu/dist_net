@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"regexp"
-	"log"
+	// "log"
 )
 
 //	A MAC address is 6 bytes
@@ -31,6 +31,7 @@ func main() {
 		fmt.Println("Error in detecting network interfaces: " + err.Error())
 		os.Exit(0)
 	}
+	//	if more than one network interface is found
 	if len(interfaces) > 0 {
 		fmt.Println("\nList of available network interfaces:")
 		for index, i := range interfaces {
@@ -55,6 +56,8 @@ func wakeOnLan(ip string,mac string) {
 	var macAddr MACAddress
 	//	 port to connect to
 	var port_num int
+	//	buffer to hold data
+	var buf bytes.Buffer
 	//	regex statement
 	//	this regex can match both 48-bit, 64-bit, and 20-octet MAC addresses
 	//	Explanation of the regex below:
@@ -89,7 +92,6 @@ func wakeOnLan(ip string,mac string) {
 		packet.payload[idx] = macAddr
 	}
 	// Fill our byte buffer with the bytes in our MagicPacket
-	var buf bytes.Buffer
 	if(binary.Write(&buf,binary.BigEndian,packet) != nil){
 		fmt.Println("Failed writing to the buffer")
 		os.Exit(1)
@@ -123,11 +125,11 @@ func wakeOnLan(ip string,mac string) {
 	defer conn.Close()
 	// Write the bytes of the MagicPacket to the connection
 	bytesWritten,err := conn.Write(buf.Bytes())
-	if err != nil{
-		fmt.Println("Unable to send packet to the destination\n")
-		log.Println(err.Error())
-	}else if bytesWritten != 102{
-		fmt.Printf("Status: %d bytes written, %d expected\n",bytesWritten,102)
-		log.Println(err.Error())
+	if err == nil && bytesWritten != 102 {
+		err = fmt.Errorf("magic packet sent was %d bytes (expected 102 bytes sent)", bytesWritten)
 	}
+	if err != nil {
+		fmt.Println("Error occurred")
+	}
+	fmt.Printf("Magic packet sent successfully to %v\n", macAddr)
 }
